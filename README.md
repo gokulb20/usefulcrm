@@ -1,28 +1,31 @@
 # UsefulCRM
 
-AI-powered business operations for small teams. Part of the Useful Tools subscription ($250/mo).
+A blank, agentic CRM powered by AI. Built on Hermes Agent.
 
-One subscription. Everything connected. Your AI agent runs it all.
+No opinions. No workflows you have to follow. Just a clean CRM with an AI agent that learns how you work and helps you do it better.
 
-## What's Included
+## What It Is
 
-- **AI Employee** (Crewm8) — handles CRM, email, research, outreach, meeting prep
-- **Website Generator** — give us your info, get a clean, simple website
-- **Contact Management** — relationships, follow-ups, deal tracking
-- **Social Media** — basic scheduling and posting
-- **Basic Accounting** — invoicing, payment tracking
+A self-hosted CRM with an embedded AI agent. The agent can:
+- Auto-log interactions from email, calls, and meetings
+- Research contacts and companies
+- Draft outreach and follow-ups
+- Track deals through your pipeline
+- Generate reports from your data
+- Do whatever else you teach it
 
-## Architecture
+The CRM is the interface. The agent is the engine. You talk to it, it handles the rest.
 
-Built on [Hermes Agent](https://github.com/NousResearch/hermes-agent) (not OpenClaw). The agent runtime handles all AI operations: tool calling, memory, skills, background jobs.
+## Tech Stack
 
-Frontend: Next.js + React + Tailwind
-Database: DuckDB (local, embedded)
-Agent: Hermes (self-improving, 100+ skills)
+- **Frontend:** Next.js + React + Tailwind
+- **Database:** DuckDB (local, fast, embedded)
+- **Agent:** Hermes Agent (self-improving, skill-based, tool-calling)
+- **Deployment:** Local or cloud. Your data stays yours.
 
 ## Status
 
-🚧 Under active development. Refactoring from DenchClaw/OpenClaw to Hermes.
+🚧 Under active development.
 
 ## License
 
