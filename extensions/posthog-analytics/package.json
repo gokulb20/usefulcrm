@@ -1,0 +1,8 @@
+{
+  "name": "@usefulcrm/posthog-analytics",
+  "version": "1.0.0",
+  "private": true,
+  "hermes": {
+    "extensions": ["./index.ts"]
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "name": "useful",
+  "version": "2.3.14",
+  "description": "Shorthand alias for usefulcrm — AI-powered CRM platform CLI",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hermes/hermes.git",
+    "directory": "packages/useful"
+  },
+  "bin": {
+    "useful": "useful.mjs"
+  },
+  "files": [
+    "useful.mjs"
+  ],
+  "type": "module",
+  "dependencies": {
+    "usefulcrm": "^2.3.14"
+  },
+  "engines": {
+    "node": ">=22.12.0"
+  }
+}

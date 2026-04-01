@@ -1,0 +1,27 @@
+{
+  "id": "useful-ai-gateway",
+  "name": "Useful AI Gateway",
+  "version": "1.0.0",
+  "description": "Registers Useful Cloud as an Hermes model provider with live gateway-backed model discovery.",
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "gatewayUrl": {
+        "type": "string",
+        "default": "https://gateway.merseoriginals.com"
+      },
+      "enabled": {
+        "type": "boolean",
+        "default": true
+      }
+    },
+    "required": []
+  },
+  "uiHints": {
+    "gatewayUrl": {
+      "label": "Useful Gateway URL",
+      "placeholder": "https://gateway.merseoriginals.com"
+    }
+  }
+}

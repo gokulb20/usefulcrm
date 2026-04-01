@@ -1,0 +1,22 @@
+{
+  "id": "posthog-analytics",
+  "name": "PostHog LLM Analytics",
+  "description": "Captures LLM generations, tool calls, and user feedback into PostHog AI",
+  "version": "1.0.0",
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "apiKey": { "type": "string" },
+      "host": { "type": "string", "default": "https://us.i.posthog.com" },
+      "enabled": { "type": "boolean", "default": true },
+      "feedbackSurveyId": { "type": "string" }
+    },
+    "required": []
+  },
+  "uiHints": {
+    "apiKey": { "label": "PostHog Project API Key", "sensitive": true },
+    "host": { "label": "PostHog Host", "placeholder": "https://us.i.posthog.com" },
+    "feedbackSurveyId": { "label": "PostHog Survey ID for feedback" }
+  }
+}

@@ -1,0 +1,13 @@
+---
+description: Git and PR rules for UsefulCRM (fork of Hermes)
+globs:
+alwaysApply: true
+---
+
+# Git Rules
+
+- This repo (UsefulHQ/UsefulCRM) is a **fork** of hermes/hermes.
+- When creating PRs, ALWAYS target `UsefulHQ/UsefulCRM` — never the upstream `hermes/hermes`.
+  Use `gh pr create --repo UsefulHQ/UsefulCRM` to ensure this.
+- NEVER commit or push without explicit user approval.
+- NEVER force push to main/master.

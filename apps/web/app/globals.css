@@ -75,7 +75,7 @@
   --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.08);
   --shadow-xl: 0 8px 32px rgba(0, 0, 0, 0.1);
 
-  /* Useful UI tokens (used by @denchhq/ui-react primitives) */
+  /* Useful UI tokens (used by @usefulhq/ui-react primitives) */
   --background: 0 0% 90%;
   --foreground: 0 0% 3.9%;
   --card: 0 0% 100%;

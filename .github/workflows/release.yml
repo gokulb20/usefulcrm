@@ -1,0 +1,99 @@
+name: Release
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  id-token: write
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.23.0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --no-frozen-lockfile
+
+      - name: Resolve release version
+        id: version
+        run: |
+          echo "value=$(node -p 'require("./package.json").version')" >> "$GITHUB_OUTPUT"
+
+      - name: Check npm publish status
+        id: npm
+        run: |
+          VERSION="${{ steps.version.outputs.value }}"
+          if npm view "usefulcrm@${VERSION}" version >/dev/null 2>&1; then
+            echo "published=true" >> "$GITHUB_OUTPUT"
+            echo "usefulcrm@${VERSION} is already published"
+          else
+            echo "published=false" >> "$GITHUB_OUTPUT"
+            echo "usefulcrm@${VERSION} is not published yet"
+          fi
+
+      - name: Check GitHub release status
+        id: github_release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG="v${{ steps.version.outputs.value }}"
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+            echo "${TAG} release already exists"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+            echo "${TAG} release does not exist yet"
+          fi
+
+      - name: Validate release checks
+        if: steps.npm.outputs.published != 'true'
+        env:
+          POSTHOG_KEY: ${{ secrets.POSTHOG_KEY }}
+        run: pnpm run deploy:check
+
+      - name: Publish usefulcrm to npm
+        if: steps.npm.outputs.published != 'true'
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          POSTHOG_KEY: ${{ secrets.POSTHOG_KEY }}
+        run: pnpm run deploy -- --skip-tests --skip-build --skip-npx-smoke
+
+      - name: Create GitHub release
+        if: steps.github_release.outputs.exists != 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG="v${{ steps.version.outputs.value }}"
+          gh release create "$TAG" \
+            --target "$GITHUB_SHA" \
+            --title "$TAG" \
+            --generate-notes
+
+      - name: Verify published npx install
+        if: steps.npm.outputs.published != 'true'
+        continue-on-error: true
+        run: bash scripts/with-root-env.sh bash scripts/deploy.sh --npx-smoke-only

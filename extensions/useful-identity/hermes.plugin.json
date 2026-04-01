@@ -1,0 +1,17 @@
+{
+  "id": "useful-identity",
+  "name": "UsefulCRM Identity",
+  "version": "1.0.0",
+  "description": "Injects the UsefulCRM identity and behavioral contracts into the agent system prompt.",
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "enabled": {
+        "type": "boolean",
+        "default": true
+      }
+    },
+    "required": []
+  }
+}
