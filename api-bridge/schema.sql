@@ -54,7 +54,7 @@ CREATE TABLE IF NOT EXISTS contacts (
     email       VARCHAR,
     phone       VARCHAR,
     title       VARCHAR,
-    company_id  VARCHAR REFERENCES companies(id) ON DELETE SET NULL,
+    company_id  VARCHAR REFERENCES companies(id),
     status      VARCHAR NOT NULL DEFAULT 'active',  -- active | lead | customer | churned
     linkedin    VARCHAR,
     twitter     VARCHAR,
@@ -69,8 +69,8 @@ CREATE INDEX IF NOT EXISTS idx_contacts_status     ON contacts (status);
 
 -- ── Contact Tags (many-to-many) ───────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS contact_tags (
-    contact_id VARCHAR NOT NULL REFERENCES contacts(id) ON DELETE CASCADE,
-    tag_id     VARCHAR NOT NULL REFERENCES tags(id)     ON DELETE CASCADE,
+    contact_id VARCHAR NOT NULL REFERENCES contacts(id),
+    tag_id     VARCHAR NOT NULL REFERENCES tags(id)    ,
     PRIMARY KEY (contact_id, tag_id)
 );
 
@@ -80,10 +80,10 @@ CREATE TABLE IF NOT EXISTS deals (
     name         VARCHAR NOT NULL,
     value        DECIMAL(18, 2),
     currency     VARCHAR NOT NULL DEFAULT 'USD',
-    stage_id     VARCHAR REFERENCES deal_stages(id) ON DELETE SET NULL,
+    stage_id     VARCHAR REFERENCES deal_stages(id),
     stage        VARCHAR,           -- denormalized stage name for quick access
-    company_id   VARCHAR REFERENCES companies(id)   ON DELETE SET NULL,
-    contact_id   VARCHAR REFERENCES contacts(id)    ON DELETE SET NULL,
+    company_id   VARCHAR REFERENCES companies(id)  ,
+    contact_id   VARCHAR REFERENCES contacts(id)   ,
     owner        VARCHAR,           -- free-text owner name / email
     close_date   DATE,
     probability  INTEGER,           -- 0-100
@@ -103,9 +103,9 @@ CREATE TABLE IF NOT EXISTS activities (
     type         VARCHAR NOT NULL DEFAULT 'note',  -- note | call | email | meeting | task
     subject      VARCHAR,
     body         TEXT,
-    contact_id   VARCHAR REFERENCES contacts(id)  ON DELETE SET NULL,
-    company_id   VARCHAR REFERENCES companies(id) ON DELETE SET NULL,
-    deal_id      VARCHAR REFERENCES deals(id)     ON DELETE SET NULL,
+    contact_id   VARCHAR REFERENCES contacts(id) ,
+    company_id   VARCHAR REFERENCES companies(id),
+    deal_id      VARCHAR REFERENCES deals(id)    ,
     completed    BOOLEAN NOT NULL DEFAULT false,
     due_at       TIMESTAMPTZ,
     occurred_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
@@ -124,9 +124,9 @@ CREATE TABLE IF NOT EXISTS documents (
     title        VARCHAR NOT NULL,
     content      TEXT,
     type         VARCHAR NOT NULL DEFAULT 'note',  -- note | proposal | contract | report
-    contact_id   VARCHAR REFERENCES contacts(id)  ON DELETE SET NULL,
-    company_id   VARCHAR REFERENCES companies(id) ON DELETE SET NULL,
-    deal_id      VARCHAR REFERENCES deals(id)     ON DELETE SET NULL,
+    contact_id   VARCHAR REFERENCES contacts(id) ,
+    company_id   VARCHAR REFERENCES companies(id),
+    deal_id      VARCHAR REFERENCES deals(id)    ,
     created_at   TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_at   TIMESTAMPTZ NOT NULL DEFAULT now()
 );

@@ -41,7 +41,7 @@ from hermes_client import HermesClient, get_client
 
 PORT = int(os.environ.get("PORT", "3200"))
 HOST = os.environ.get("HOST", "0.0.0.0")
-DB_PATH = Path(os.environ.get("CRM_DB_PATH", Path(__file__).parent / "crm.duckdb"))
+DB_PATH = Path(os.environ.get("CRM_DB_PATH", Path(__file__).parent / "data" / "usefulcrm.duckdb"))
 SCHEMA_PATH = Path(__file__).parent / "schema.sql"
 
 # ── Database helpers ───────────────────────────────────────────────────────────
