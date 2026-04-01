@@ -1,0 +1,92 @@
+{
+  "name": "usefulcrm",
+  "version": "2.4.6",
+  "description": "Fully Managed Hermes Framework for managing your CRM, Sales Automation and Outreach agents. The only local productivity tool you need.",
+  "keywords": [],
+  "homepage": "https://github.com/UsefulHQ/UsefulCRM#readme",
+  "bugs": {
+    "url": "https://github.com/UsefulHQ/UsefulCRM/issues"
+  },
+  "license": "MIT",
+  "author": "Kumar Abhirup <team@usefulventures.com>, UsefulCRM <support@usefulventures.com>",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/UsefulHQ/UsefulCRM.git"
+  },
+  "bin": {
+    "useful": "usefulcrm.mjs",
+    "usefulcrm": "usefulcrm.mjs"
+  },
+  "files": [
+    "apps/web/.next/standalone/",
+    "apps/web/.next/static/",
+    "apps/web/public/",
+    "LICENSE",
+    "usefulcrm.mjs",
+    "README.md",
+    "assets/",
+    "dist/",
+    "extensions/",
+    "skills/"
+  ],
+  "type": "module",
+  "main": "dist/entry.js",
+  "exports": {
+    ".": "./dist/entry.js",
+    "./cli-entry": "./usefulcrm.mjs"
+  },
+  "scripts": {
+    "build": "tsdown",
+    "build:plugin-env": "node scripts/build-plugin-env.mjs",
+    "check": "pnpm format:check && pnpm lint",
+    "usefulcrm": "node usefulcrm.mjs",
+    "dev": "node usefulcrm.mjs",
+    "format": "oxfmt --write",
+    "format:check": "oxfmt --check",
+    "lint": "oxlint --type-aware",
+    "prepack": "pnpm build:plugin-env && pnpm build && pnpm web:build && pnpm web:prepack",
+    "start": "node usefulcrm.mjs",
+    "test": "pnpm test:cli && pnpm --dir apps/web test",
+    "test:cli": "vitest run --config vitest.unit.config.ts src/cli/run-main.test.ts src/cli/bootstrap-external.test.ts src/cli/bootstrap-external.bootstrap-command.test.ts src/cli/useful-cloud.test.ts src/cli/workspace-seed.test.ts src/cli/web-runtime.test.ts src/cli/web-runtime-command.test.ts src/cli/flatten-standalone-deps.test.ts",
+    "test:web": "pnpm --dir apps/web test",
+    "web:build": "pnpm --dir apps/web build",
+    "web:dev": "pnpm --dir apps/web dev",
+    "web:install": "pnpm --dir apps/web install",
+    "web:prepack": "cp -r apps/web/public apps/web/.next/standalone/apps/web/public && cp -r apps/web/.next/static apps/web/.next/standalone/apps/web/.next/static && node scripts/flatten-standalone-deps.mjs",
+    "deploy:check": "bash scripts/with-root-env.sh bash scripts/deploy.sh --skip-publish",
+    "deploy": "bash scripts/with-root-env.sh bash scripts/deploy.sh",
+    "deploy:major": "bash scripts/with-root-env.sh bash scripts/deploy.sh --bump major",
+    "deploy:minor": "bash scripts/with-root-env.sh bash scripts/deploy.sh --bump minor",
+    "deploy:patch": "bash scripts/with-root-env.sh bash scripts/deploy.sh --bump patch",
+    "github:sync-secrets": "bash scripts/with-root-env.sh bash scripts/sync-github-secrets.sh"
+  },
+  "dependencies": {
+    "@clack/prompts": "^1.0.1",
+    "axios": "^1.13.5",
+    "chalk": "^5.6.2",
+    "commander": "^14.0.3",
+    "gradient-string": "^3.0.0",
+    "json5": "^2.2.3",
+    "posthog-node": "^5.27.1",
+    "tslog": "^4.10.2"
+  },
+  "devDependencies": {
+    "@types/node": "^25.3.0",
+    "oxfmt": "0.34.0",
+    "oxlint": "^1.49.0",
+    "oxlint-tsgolint": "^0.14.2",
+    "tsdown": "^0.20.3",
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.18"
+  },
+  "peerDependencies": {
+    "hermes": ">=2026.1.0"
+  },
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "packageManager": "pnpm@10.23.0",
+  "pnpm": {
+    "minimumReleaseAge": 2880
+  }
+}

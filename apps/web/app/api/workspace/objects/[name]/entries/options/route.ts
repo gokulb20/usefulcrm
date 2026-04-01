@@ -1,0 +1,111 @@
+import { duckdbQueryOnFile, findDuckDBForObject } from "@/lib/workspace";
+
+export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
+
+type ObjectRow = {
+	id: string;
+	name: string;
+	display_field?: string;
+};
+
+type FieldRow = {
+	id: string;
+	name: string;
+	type: string;
+};
+
+function sqlEscape(s: string): string {
+	return s.replace(/'/g, "''");
+}
+
+function resolveDisplayField(
+	obj: ObjectRow,
+	fields: FieldRow[],
+): string {
+	if (obj.display_field) {return obj.display_field;}
+	const nameField = fields.find(
+		(f) => /\bname\b/i.test(f.name) || /\btitle\b/i.test(f.name),
+	);
+	if (nameField) {return nameField.name;}
+	const textField = fields.find((f) => f.type === "text");
+	if (textField) {return textField.name;}
+	return fields[0]?.name ?? "id";
+}
+
+/**
+ * GET /api/workspace/objects/[name]/entries/options
+ * Returns lightweight { options: [{ id, label }] } for relation dropdowns.
+ * Supports optional ?q= search parameter.
+ */
+export async function GET(
+	req: Request,
+	{ params }: { params: Promise<{ name: string }> },
+) {
+	const { name } = await params;
+
+	if (!/^[a-zA-Z_][a-zA-Z0-9_]*$/.test(name)) {
+		return Response.json({ error: "Invalid object name" }, { status: 400 });
+	}
+
+	const dbFile = findDuckDBForObject(name);
+	if (!dbFile) {
+		return Response.json({ error: "DuckDB not found" }, { status: 404 });
+	}
+
+	const objects = duckdbQueryOnFile<ObjectRow>(dbFile,
+		`SELECT * FROM objects WHERE name = '${sqlEscape(name)}' LIMIT 1`,
+	);
+	if (objects.length === 0) {
+		return Response.json({ error: `Object '${name}' not found` }, { status: 404 });
+	}
+	const obj = objects[0];
+
+	const fields = duckdbQueryOnFile<FieldRow>(dbFile,
+		`SELECT * FROM fields WHERE object_id = '${sqlEscape(obj.id)}' ORDER BY sort_order`,
+	);
+	const displayFieldName = resolveDisplayField(obj, fields);
+	const displayFieldId = fields.find((field) => field.name === displayFieldName)?.id;
+
+	// Optional search filter
+	const url = new URL(req.url);
+	const query = url.searchParams.get("q")?.trim() ?? "";
+	const escapedQuery = sqlEscape(query.toLowerCase());
+	const searchWhereSql = query
+		? `
+			AND (
+				LOWER(e.id) LIKE '%${escapedQuery}%'
+				OR EXISTS (
+					SELECT 1
+					FROM entry_fields search_ef
+					WHERE search_ef.entry_id = e.id
+					  AND search_ef.value IS NOT NULL
+					  AND LOWER(search_ef.value) LIKE '%${escapedQuery}%'
+				)
+			)
+		`
+		: "";
+
+	// Fetch entries and always label by the effective display/main field.
+	// Search can match any field, but labels stay stable for foreign-entry pickers.
+	const rows = duckdbQueryOnFile<{ entry_id: string; label: string | null }>(dbFile,
+		`SELECT
+			e.id as entry_id,
+			display_ef.value as label
+		 FROM entries e
+		 LEFT JOIN entry_fields display_ef
+		   ON display_ef.entry_id = e.id
+		  ${displayFieldId ? `AND display_ef.field_id = '${sqlEscape(displayFieldId)}'` : "AND 1 = 0"}
+		 WHERE e.object_id = '${sqlEscape(obj.id)}'
+		 ${searchWhereSql}
+		 ORDER BY COALESCE(display_ef.value, e.id) ASC
+		 LIMIT 200`,
+	);
+
+	const options = rows.map((r) => ({
+		id: r.entry_id,
+		label: r.label || r.entry_id,
+	}));
+
+	return Response.json({ options, displayField: displayFieldName });
+}
